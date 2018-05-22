@@ -23,12 +23,18 @@ namespace ContosoUniversity.Controllers
         // The return type Task<IActionResult> represents ongoing work (a promise) with a result of type IActionResult.
         // The await keyword causes the compiler to split the method into two parts.The first part ends with the operation that's started asynchronously. The second part is put into a callback method that's called when the operation completes.
         // ToListAsync is the asynchronous version of the ToList extension method.
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewData["CurrentFilter"] = searchString;
 
             var students = from s in _context.Students select s;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                students = students.Where(s => s.LastName.Contains(searchString) || s.FirstMidName.Contains(searchString));
+            }
 
             switch (sortOrder)
             {
